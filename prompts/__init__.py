@@ -7,7 +7,6 @@ This module provides prompt templates and utilities for the SmolAgent framework.
 from .templates import (
     action_planning_template,
     tool_description_template,
-    chat_history_prompt_template,
     SMOLAGENT_PLANNING_INITIAL_TEMPLATE,
     SMOLAGENT_PLANNING_UPDATE_PRE_TEMPLATE,
     SMOLAGENT_PLANNING_UPDATE_POST_TEMPLATE,
@@ -20,7 +19,6 @@ from .templates import (
 __all__ = [
     "action_planning_template",
     "tool_description_template", 
-    "chat_history_prompt_template",
     "SMOLAGENT_PLANNING_INITIAL_TEMPLATE",
     "SMOLAGENT_PLANNING_UPDATE_PRE_TEMPLATE",
     "SMOLAGENT_PLANNING_UPDATE_POST_TEMPLATE",
