@@ -65,10 +65,12 @@ export AWS_DEFAULT_REGION=us-east-1
 source venv/bin/activate
 
 # Run the simple agent
-python simple_agent.py
+python main.py
 ```
 
 ## Usage
+
+### Basic Usage
 
 The agent can handle natural language math questions:
 
@@ -76,6 +78,30 @@ The agent can handle natural language math questions:
 - "Can you multiply 7 by 8?"
 - "What's 100 divided by 4?"
 - "Calculate 50 minus 17"
+
+### Programmatic Usage
+
+You can also import and use the agent in your own code:
+
+```python
+from agent import SimpleAgent
+
+# Initialize agent
+agent = SimpleAgent()
+
+# Ask a question
+response = agent.run("What is 20 + 15?")
+print(response)  # Output: 35
+```
+
+## Architecture
+
+The agent follows a modular architecture:
+
+- **main.py**: Entry point with test examples and main function
+- **agent.py**: Core agent implementation with `SimpleAgent` and `LiteLLMModel` classes
+- **agent_tools/calculator.py**: Modular calculator tool implementation
+- **prompts/templates.py**: Professional prompt template system
 
 ## Configuration
 
@@ -92,20 +118,19 @@ agent = SimpleAgent(
 ## Project Structure
 
 ```
-test-mcp-connector/
-├── simple_agent.py      # Main agent implementation
-├── prompts/             # Prompt templates module
-│   ├── __init__.py     # Module initialization
-│   └── templates.py    # Comprehensive prompt templates
-├── requirements.txt     # Python dependencies  
-├── setup.sh            # Setup script
-├── README.md           # This file
-└── venv/               # Virtual environment (created by setup)
+simple-agent-smolagents/
+├── main.py                    # Entry point and test examples
+├── agent.py                   # SimpleAgent and LiteLLMModel classes
+├── agent_tools/
+│   ├── __init__.py
+│   └── calculator.py          # Calculator tool implementation
+├── prompts/
+│   ├── __init__.py
+│   └── templates.py           # Professional prompt templates
+├── requirements.txt           # Dependencies
+├── setup.sh                   # Environment setup script
+└── README.md                  # This file
 ```
-
-## Architecture
-
-This project follows the same architectural patterns as enterprise-grade LLM systems:
 
 ### Prompt Template System
 - **Action Planning Template**: Guides the agent's reasoning and code generation
