@@ -7,6 +7,8 @@ A minimal implementation of an AI agent using SmolAgent with LiteLLM via AWS Bed
 - 🤖 **SmolAgent**: Uses the SmolAgent framework for agent functionality
 - 🔢 **Calculator Tool**: Simple arithmetic operations (add, subtract, multiply, divide)  
 - ☁️ **AWS Bedrock**: LiteLLM integration with AWS Bedrock Claude model
+- 🎯 **Custom Prompts**: Professional prompt templates similar to enterprise systems
+- 📝 **Template System**: Jinja2-based template rendering for dynamic prompts
 - 🚀 **Simple Setup**: Minimal configuration required
 
 ## Demo
@@ -92,17 +94,75 @@ agent = SimpleAgent(
 ```
 test-mcp-connector/
 ├── simple_agent.py      # Main agent implementation
+├── prompts/             # Prompt templates module
+│   ├── __init__.py     # Module initialization
+│   └── templates.py    # Comprehensive prompt templates
 ├── requirements.txt     # Python dependencies  
 ├── setup.sh            # Setup script
 ├── README.md           # This file
 └── venv/               # Virtual environment (created by setup)
 ```
 
+## Architecture
+
+This project follows the same architectural patterns as enterprise-grade LLM systems:
+
+### Prompt Template System
+- **Action Planning Template**: Guides the agent's reasoning and code generation
+- **Tool Description Template**: Dynamic rendering of available tools
+- **SmolAgent Templates**: Planning, managed agents, and final answer formatting
+- **Jinja2 Integration**: Professional template rendering with variable substitution
+
+### Agent Components
+- **LiteLLMModel**: Custom model adapter for AWS Bedrock integration
+- **CalculatorTool**: Example tool following SmolAgent patterns
+- **Template Rendering**: Dynamic prompt generation based on available tools
+
 ## Dependencies
 
 - `litellm`: LLM gateway for AWS Bedrock integration
-- `smolagents`: Agent framework
+- `smolagents`: Agent framework (v1.17.0 - matches enterprise template)
 - `boto3`: AWS SDK for Python
+- `jinja2`: Template engine for dynamic prompt generation
+
+## Advanced Usage
+
+### Customizing Prompts
+
+You can modify the prompt templates in `prompts/templates.py` to customize agent behavior:
+
+```python
+# Example: Adding domain-specific examples to the action planning template
+action_planning_template = """
+    You are an expert mathematical assistant...
+    
+    Here are examples for your domain:
+    - Financial calculations
+    - Scientific computations
+    - Statistical analysis
+"""
+```
+
+### Adding New Tools
+
+Follow the SmolAgent pattern to add new tools:
+
+```python
+class NewTool(Tool):
+    name = "new_tool"
+    description = "Description of what this tool does"
+    inputs = {
+        "param1": {
+            "type": "string",
+            "description": "Parameter description"
+        }
+    }
+    output_type = "string"
+
+    def forward(self, param1: str) -> str:
+        # Tool implementation
+        return f"Result: {param1}"
+```
 
 ## Troubleshooting
 
