@@ -1,55 +1,48 @@
-# Simple Agent with Calculator Tool
+# Enhanced SmolAgent with Calculator and Excel Tools
 
-A minimal implementation of an AI agent using SmolAgent with LiteLLM via AWS Bed## Project Structure
-
-```
-simple-agent-smolagents/
-├── main.py                    # Entry point and test examples
-├── agent.py                   # SimpleAgent and LiteLLMModel classes
-├── agent_tools/
-│   ├── __init__.py
-│   └── calculator.py          # Calculator tool implementation
-├── mcp/
-│   ├── __init__.py
-│   ├── connector.py           # MCP connector for Excel server
-│   └── mcp_servers.json       # MCP server configurations
-├── prompts/
-│   ├── __init__.py
-│   └── templates.py           # Professional prompt templates
-├── scripts/
-│   ├── mcp_demo.py           # MCP connector demonstration
-│   └── excel_integration_demo.py  # Excel MCP integration example
-├── requirements.txt           # Dependencies
-├── setup.sh                   # Environment setup script
-└── README.md                  # This file
-```
-
-## Usage
-
-### Basic Agent Usagecalculator tool.
+A comprehensive implementation of an AI agent using SmolAgent with LiteLLM via AWS Bedrock, featuring both calculator and Excel operations through MCP (Model Context Protocol).
 
 ## Features
 
-- 🤖 **SmolAgent**: Uses the SmolAgent framework for agent functionality
-- 🔢 **Calculator Tool**: Simple arithmetic operations (add, subtract, multiply, divide)  
+- 🤖 **SmolAgent**: Uses the SmolAgent framework for intelligent agent functionality
+- 🔢 **Calculator Tool**: Arithmetic operations (add, subtract, multiply, divide)  
+- 📊 **Excel MCP Tool**: Complete Excel operations via Model Context Protocol
+  - Create and manage workbooks
+  - Read/write worksheet data  
+  - Format cells and ranges
+  - Generate charts and pivot tables
 - ☁️ **AWS Bedrock**: LiteLLM integration with AWS Bedrock Claude model
-- 🎯 **Custom Prompts**: Professional prompt templates similar to enterprise systems
+- 🎯 **Custom Prompts**: Professional prompt templates with tool examples
 - 📝 **Template System**: Jinja2-based template rendering for dynamic prompts
-- 🚀 **Simple Setup**: Minimal configuration required
+- � **MCP Integration**: Model Context Protocol for Excel server communication
+- 🚀 **Natural Language**: Handles complex requests through conversational interface
 
 ## Demo
 
-The agent successfully handles natural language math questions:
+The agent successfully handles both mathematical and Excel operations through natural language:
 
+### Calculator Operations
 ```
 ❓ Question: What is 15 + 25?
 🤖 Answer: 40
 
-❓ Question: Can you multiply 7 by 8?
-🤖 Answer: 56
+❓ Question: Calculate 100 divided by 4 and then add 10  
+🤖 Answer: 35.0
+```
 
-❓ Question: What's 100 divided by 4?
-🤖 Answer: 25.0
+### Excel Operations
+```
+❓ Question: Create an Excel file with my budget: Rent 1200, Food 400, Transport 150
+🤖 Answer: Excel budget file created successfully with expense data
+
+❓ Question: Read the sales data from my Excel file and calculate the total
+🤖 Answer: Total sales: 4750 (data read from Excel file)
+```
+
+### Combined Operations
+```
+❓ Question: Calculate 25% of 2000 and save the result in an Excel file
+🤖 Answer: Calculated 500 (25% of 2000) and saved to Excel file
 ```
 
 ## Prerequisites

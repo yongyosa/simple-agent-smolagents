@@ -94,6 +94,17 @@ class MCPConnector:
             
             self.active_processes[server_name] = process
             print(f"✅ Server '{server_name}' started with PID {process.pid}")
+            
+            # Initialize MCP connection
+            import time
+            time.sleep(2)  # Give server time to start
+            
+            success = self._initialize_mcp_connection(server_name)
+            if not success:
+                print(f"❌ Failed to initialize MCP connection for '{server_name}'")
+                self.stop_server(server_name)
+                return False
+                
             return True
             
         except Exception as e:
@@ -159,6 +170,65 @@ class MCPConnector:
             if self.get_server_status(server_name) == "running":
                 active.append(server_name)
         return active
+
+    def _initialize_mcp_connection(self, server_name: str) -> bool:
+        """Initialize MCP connection with proper handshake"""
+        if server_name not in self.active_processes:
+            return False
+            
+        process = self.active_processes[server_name]
+        
+        try:
+            import json
+            import time
+            
+            # Step 1: Send initialize request
+            init_request = {
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "initialize",
+                "params": {
+                    "protocolVersion": "2024-11-05",
+                    "capabilities": {
+                        "tools": {}
+                    },
+                    "clientInfo": {
+                        "name": "excel-mcp-connector",
+                        "version": "1.0.0"
+                    }
+                }
+            }
+            
+            request_line = json.dumps(init_request) + "\n"
+            process.stdin.write(request_line)
+            process.stdin.flush()
+            
+            # Read initialization response
+            time.sleep(1)
+            response_line = process.stdout.readline().strip()
+            if response_line:
+                response = json.loads(response_line)
+                if "result" not in response:
+                    print(f"❌ MCP initialization failed: {response}")
+                    return False
+            
+            # Step 2: Send initialized notification
+            initialized_request = {
+                "jsonrpc": "2.0",
+                "method": "notifications/initialized"
+            }
+            
+            request_line = json.dumps(initialized_request) + "\n"
+            process.stdin.write(request_line)
+            process.stdin.flush()
+            time.sleep(0.5)
+            
+            print(f"✅ MCP connection initialized for '{server_name}'")
+            return True
+            
+        except Exception as e:
+            print(f"❌ MCP initialization error: {e}")
+            return False
     
     def test_excel_server(self, server_name: str = "excel") -> bool:
         """Test the Excel MCP server functionality"""

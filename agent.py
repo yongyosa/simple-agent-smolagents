@@ -19,6 +19,7 @@ from prompts.templates import (
     SMOLAGENT_FINAL_ANSWER_POST_TEMPLATE,
 )
 from agent_tools.calculator import CalculatorTool
+from agent_tools.excel_mcp import ExcelMCPTool
 
 
 class LiteLLMModel(Model):
@@ -121,14 +122,17 @@ class SimpleAgent:
         self.agent = self._init_agent()
 
     def _init_agent(self) -> CodeAgent:
-        """Initialize the CodeAgent with calculator tool and custom prompts."""
+        """Initialize the CodeAgent with calculator tool, Excel MCP tool, and custom prompts."""
         
-        # Create tools list
-        tools_list = [CalculatorTool()]
+        # Create tools list with both calculator and Excel tools
+        tools_list = [
+            CalculatorTool(),
+            ExcelMCPTool()
+        ]
         
         # Prepare dynamic values for prompt templates
         tool_descriptions = self._render_tool_descriptions(tools_list)
-        authorized_imports = "math, numpy, pandas"  # Basic math imports
+        authorized_imports = "math, numpy, pandas, os, json"  # Added imports for Excel operations
         
         # Render the main system prompt
         planning_prompt = (
