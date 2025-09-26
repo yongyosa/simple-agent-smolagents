@@ -1,0 +1,31 @@
+"""
+Prompts module for Simple Agent with Calculator Tool
+
+This module provides prompt templates and utilities for the SmolAgent framework.
+"""
+
+from .templates import (
+    action_planning_template,
+    tool_description_template,
+    chat_history_prompt_template,
+    SMOLAGENT_PLANNING_INITIAL_TEMPLATE,
+    SMOLAGENT_PLANNING_UPDATE_PRE_TEMPLATE,
+    SMOLAGENT_PLANNING_UPDATE_POST_TEMPLATE,
+    SMOLAGENT_MANAGED_AGENT_TASK_TEMPLATE,
+    SMOLAGENT_MANAGED_AGENT_REPORT_TEMPLATE,
+    SMOLAGENT_FINAL_ANSWER_PRE_TEMPLATE,
+    SMOLAGENT_FINAL_ANSWER_POST_TEMPLATE,
+)
+
+__all__ = [
+    "action_planning_template",
+    "tool_description_template", 
+    "chat_history_prompt_template",
+    "SMOLAGENT_PLANNING_INITIAL_TEMPLATE",
+    "SMOLAGENT_PLANNING_UPDATE_PRE_TEMPLATE",
+    "SMOLAGENT_PLANNING_UPDATE_POST_TEMPLATE",
+    "SMOLAGENT_MANAGED_AGENT_TASK_TEMPLATE",
+    "SMOLAGENT_MANAGED_AGENT_REPORT_TEMPLATE",
+    "SMOLAGENT_FINAL_ANSWER_PRE_TEMPLATE",
+    "SMOLAGENT_FINAL_ANSWER_POST_TEMPLATE",
+]

@@ -5,8 +5,21 @@ Simple Agent with SmolAgent, LiteLLM via AWS Bedrock, and Calculator Tool
 """
 
 import litellm
+from jinja2 import Template
 from typing import Dict, List, Optional, Union
 from smolagents import CodeAgent, Tool, Model, ChatMessage, MessageRole, TokenUsage
+
+from prompts.templates import (
+    action_planning_template,
+    tool_description_template,
+    SMOLAGENT_PLANNING_INITIAL_TEMPLATE,
+    SMOLAGENT_PLANNING_UPDATE_PRE_TEMPLATE,
+    SMOLAGENT_PLANNING_UPDATE_POST_TEMPLATE,
+    SMOLAGENT_MANAGED_AGENT_TASK_TEMPLATE,
+    SMOLAGENT_MANAGED_AGENT_REPORT_TEMPLATE,
+    SMOLAGENT_FINAL_ANSWER_PRE_TEMPLATE,
+    SMOLAGENT_FINAL_ANSWER_POST_TEMPLATE,
+)
 
 
 class CalculatorTool(Tool):
@@ -146,19 +159,53 @@ class SimpleAgent:
         self.agent = self._init_agent()
 
     def _init_agent(self) -> CodeAgent:
-        """Initialize the CodeAgent with calculator tool."""
+        """Initialize the CodeAgent with calculator tool and custom prompts."""
         
         # Create tools list
         tools_list = [CalculatorTool()]
         
-        # Create agent with LiteLLM model
+        # Prepare dynamic values for prompt templates
+        tool_descriptions = self._render_tool_descriptions(tools_list)
+        authorized_imports = "math, numpy, pandas"  # Basic math imports
+        
+        # Render the main system prompt
+        planning_prompt = (
+            action_planning_template.replace("{{tool_descriptions}}", tool_descriptions)
+            .replace("{{managed_agents_descriptions}}", "")
+            .replace("{{authorized_imports}}", authorized_imports)
+        )
+        
+        # Create agent with LiteLLM model and custom prompt templates
         agent = CodeAgent(
             tools=tools_list,
             model=LiteLLMModel(self.model_id, aws_region_name=self.aws_region_name),
+            prompt_templates={
+                "system_prompt": planning_prompt,
+                "planning": {
+                    "initial_plan": SMOLAGENT_PLANNING_INITIAL_TEMPLATE,
+                    "update_plan_pre_messages": SMOLAGENT_PLANNING_UPDATE_PRE_TEMPLATE,
+                    "update_plan_post_messages": SMOLAGENT_PLANNING_UPDATE_POST_TEMPLATE
+                },
+                "managed_agent": {
+                    "task": SMOLAGENT_MANAGED_AGENT_TASK_TEMPLATE,
+                    "report": SMOLAGENT_MANAGED_AGENT_REPORT_TEMPLATE
+                },
+                "final_answer": {
+                    "pre_messages": SMOLAGENT_FINAL_ANSWER_PRE_TEMPLATE,
+                    "post_messages": SMOLAGENT_FINAL_ANSWER_POST_TEMPLATE
+                },
+            },
+            additional_authorized_imports=authorized_imports.split(","),
             max_print_outputs_length=200,
         )
         
         return agent
+
+    @staticmethod
+    def _render_tool_descriptions(tools_list) -> str:
+        """Render tool descriptions using the template."""
+        template = Template(tool_description_template)
+        return "\n".join(template.render(tool=tool) for tool in tools_list)
 
     def run(self, question: str) -> str:
         """Run the agent with a question and return the response."""
