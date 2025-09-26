@@ -86,61 +86,6 @@ tool_description_template = """
     Returns output type: {{tool.output_type}}
 """
 
-# Template for chat history context (if needed for future enhancements)
-chat_history_prompt_template = """
-You are a helpful mathematical assistant. You will be given a chat history and a user question.
-
-Your task is to rephrase the question based on the chat history and the user question.
-You should start with thinking if the question is relevant to the chat history. If it is not relevant, you should return the question as is.
-If it is relevant, you should rephrase the question so that it is standalone and makes sense even without the chat history.
-
-To solve the task, you must return a rephrased question in a series of steps, in a cycle of 'Thought:', 'Text:' sequences.
-At each step, in the 'Thought:' sequence, you should first explain your reasoning towards solving the task. In case the question and the chat history don't fit together, return the question as is.
-Then in the 'Text:' sequence, you should write the new question with information from the chat history. The Text sequence must end with '<end_text>' sequence.
-
-Never assume any values.
-
-Here are a few examples:
----
-chat_buffer: '''
-    Human: What is 15 + 25?
-    Assistant: The result of 15 + 25 is 40.
-'''
-question: "Now multiply that by 3",
-
-Thought: "Looking at the chat history, I can see that there was a previous calculation that resulted in 40. The user is now asking to multiply 'that' by 3, which refers to the previous result. I should rephrase this to include the specific number."
-Text:
-```text
-What is 40 multiplied by 3?
-```<end_text>
-
----
-chat_buffer: '''
-    No chat history found
-'''
-question: "What is 50 divided by 2?",
-
-Thought: "Looking at the chat history, there is no previous context. The user is asking a standalone math question. This question doesn't require any additional context."
-Text:
-```text
-What is 50 divided by 2?
-```<end_text>
-
----
-
-{{chat_buffer}}
-
-{{question}}
-
----
-
-Here are the rules you must always follow:
-1. Always provide a 'Thought:' sequence, and a 'Text:\n```text' sequence ending with '```<end_text>' sequence. Do not skip this.
-2. Never change the intention of the question. Only add more information if needed.
-
-Now Begin! If you solve the task correctly, you will receive a reward of $1,000,000.
-"""
-
 # SmolAgent planning templates (matching the template repository structure)
 SMOLAGENT_PLANNING_INITIAL_TEMPLATE = '''
     You are a world expert at analyzing mathematical problems and planning accordingly towards solving them.
