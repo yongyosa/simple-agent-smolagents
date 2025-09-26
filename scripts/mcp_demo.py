@@ -4,6 +4,11 @@
 MCP Connector Demonstration with Excel MCP Server
 """
 
+import sys
+import os
+# Add parent directory to path to import modules
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import time
 from mcp.connector import MCPConnector, create_sample_excel_config
 

@@ -10,7 +10,7 @@ import os
 
 
 # Constants
-DEFAULT_CONFIG_FILE = "mcp_servers.json"
+DEFAULT_CONFIG_FILE = "mcp/mcp_servers.json"
 
 
 @dataclass

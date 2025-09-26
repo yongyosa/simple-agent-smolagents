@@ -4,10 +4,13 @@
 Excel MCP Integration Example with SmolAgent
 """
 
-from mcp.connector import MCPConnector
-from agent import SimpleAgent
-import time
+import sys
 import os
+# Add parent directory to path to import modules
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from mcp.connector import MCPConnector
+import time
 import tempfile
 
 

@@ -1,6 +1,32 @@
 # Simple Agent with Calculator Tool
 
-A minimal implementation of an AI agent using SmolAgent with LiteLLM via AWS Bedrock and a simple calculator tool.
+A minimal implementation of an AI agent using SmolAgent with LiteLLM via AWS Bed## Project Structure
+
+```
+simple-agent-smolagents/
+├── main.py                    # Entry point and test examples
+├── agent.py                   # SimpleAgent and LiteLLMModel classes
+├── agent_tools/
+│   ├── __init__.py
+│   └── calculator.py          # Calculator tool implementation
+├── mcp/
+│   ├── __init__.py
+│   ├── connector.py           # MCP connector for Excel server
+│   └── mcp_servers.json       # MCP server configurations
+├── prompts/
+│   ├── __init__.py
+│   └── templates.py           # Professional prompt templates
+├── scripts/
+│   ├── mcp_demo.py           # MCP connector demonstration
+│   └── excel_integration_demo.py  # Excel MCP integration example
+├── requirements.txt           # Dependencies
+├── setup.sh                   # Environment setup script
+└── README.md                  # This file
+```
+
+## Usage
+
+### Basic Agent Usagecalculator tool.
 
 ## Features
 
@@ -200,3 +226,24 @@ class NewTool(Tool):
 - Make sure virtual environment is activated
 - Check Python version (3.8+ required)
 - Reinstall dependencies if needed: `pip install -r requirements.txt`
+
+### MCP (Model Context Protocol) Integration
+
+The project includes a simple MCP connector for Excel operations:
+
+```bash
+# Run MCP demonstration
+python scripts/mcp_demo.py
+
+# Run Excel integration demo  
+python scripts/excel_integration_demo.py
+
+# Interactive MCP demo
+python scripts/mcp_demo.py --interactive
+```
+
+The MCP connector supports:
+- Excel file operations (create, read, write)
+- Chart and pivot table generation
+- Cell formatting and styling
+- Integration with SmolAgent framework
