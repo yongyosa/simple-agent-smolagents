@@ -58,7 +58,7 @@ export AWS_DEFAULT_REGION=us-east-1
 # Activate the virtual environment
 source env/bin/activate
 
-# Install oackages
+# Install packages
 pip install --index-url https://pypi.org/simple/ -r requirements.txt
 
 # Run the simple agent
