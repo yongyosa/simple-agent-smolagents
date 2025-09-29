@@ -27,17 +27,9 @@ def main():
     
     # Test questions demonstrating both tools
     test_questions = [
-        # Calculator examples
-        "What is 15 + 25?",
-        "Can you multiply 7 by 8?", 
-        "Calculate 100 divided by 4 and then add 10",
-        
         # Excel examples
         f"Create an Excel file at '{temp_dir}/budget.xlsx' with my expenses: Rent 1200, Food 400, Transport 150",
-        f"Read the data from '{temp_dir}/budget.xlsx' and calculate the total expenses",
-        
-        # Combined example
-        "Calculate 25% of 2000 and create an Excel file with the result"
+        f"Read the data from '{temp_dir}/budget.xlsx', doulbe the food amount and calculate the total expenses. Then, write the result back to the file with name budget_modify.xlsx",
     ]
     
     for i, question in enumerate(test_questions, 1):
