@@ -21,48 +21,6 @@ A comprehensive implementation of an AI agent using SmolAgent with LiteLLM via A
 - 🔌 **MCP Integration**: Model Context Protocol for Excel and Time server communication
 - 🚀 **Natural Language**: Handles complex requests through conversational interface
 
-## Demo
-
-The agent successfully handles both mathematical and Excel operations through natural language:
-
-### Calculator Operations
-```
-❓ Question: What is 15 + 25?
-🤖 Answer: 40
-
-❓ Question: Calculate 100 divided by 4 and then add 10  
-🤖 Answer: 35.0
-```
-
-### Excel Operations
-```
-❓ Question: Create an Excel file with my budget: Rent 1200, Food 400, Transport 150
-🤖 Answer: Excel budget file created successfully with expense data
-
-❓ Question: Read the sales data from my Excel file and calculate the total
-🤖 Answer: Total sales: 4750 (data read from Excel file)
-```
-
-### Time Operations
-```
-❓ Question: What is the current time in UTC?
-🤖 Answer: Current time in UTC: 2025-09-29T11:34:24+00:00
-
-❓ Question: Convert 2:30 PM New York time to Tokyo time
-🤖 Answer: 2:30 PM in New York is 3:30 AM (next day) in Tokyo
-
-❓ Question: What time is it in London right now?
-🤖 Answer: Current time in London: 2025-09-29T12:34:24+01:00
-```
-
-### Combined Operations
-```
-❓ Question: Calculate 25% of 2000 and save the result in an Excel file
-🤖 Answer: Calculated 500 (25% of 2000) and saved to Excel file
-
-❓ Question: Get the current time in Tokyo and save it to an Excel file
-🤖 Answer: Current Tokyo time retrieved and saved to Excel spreadsheet
-```
 
 ## Prerequisites
 
@@ -75,11 +33,9 @@ The agent successfully handles both mathematical and Excel operations through na
 ### 1. Setup Environment
 
 ```bash
-# Make setup script executable
-chmod +x setup.sh
-
-# Run setup
-./setup.sh
+python3 -m venv env
+source env/bin/activate
+export PYTHONPATH=".:$PYTHONPATH"
 ```
 
 ### 2. Configure AWS Credentials
@@ -100,7 +56,10 @@ export AWS_DEFAULT_REGION=us-east-1
 
 ```bash
 # Activate the virtual environment
-source venv/bin/activate
+source env/bin/activate
+
+# Install oackages
+pip install --index-url https://pypi.org/simple/ -r requirements.txt
 
 # Run the simple agent
 python main.py
