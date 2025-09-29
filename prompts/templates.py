@@ -1,8 +1,9 @@
 """
-Prompt templates for the Simple Agent with Calculator Tool
+Prompt templates for the Simple Agent with Calculator and Excel Tools
 
 This module contains prompt templates used by the SmolAgent framework
-to guide the agent's behavior and responses.
+to guide the agent's behavior and responses when working with
+mathematical calculations and Excel file operations.
 """
 
 # Main system prompt template for the agent
@@ -57,7 +58,43 @@ action_planning_template = """
     ```<end_code>
     ---
 
-    Above examples were using the calculator tool. You have access to these tools:
+    Here are examples using the Excel tool:
+    ---
+
+    Task: "Create an Excel file called 'budget.xlsx' with my monthly expenses: Rent 1200, Food 400, Transport 150, Entertainment 300"
+
+    Thought: I need to create an Excel file and add data to it. First I'll create the workbook, then write the expense data to it.
+    Code:
+    ```py
+    # Create a new Excel workbook
+    result = excel_mcp(operation="create_workbook", file_path="budget.xlsx")
+    final_answer(result)
+    ```<end_code>
+    ---
+
+    Task: "Read the data from 'sales.xlsx' file and calculate the total sales for Q1"
+
+    Thought: I need to read data from an Excel file, then use the calculator to sum up the sales figures.
+    Code:
+    ```py
+    # Read data from Excel file
+    result = excel_mcp(operation="read_worksheet", file_path="sales.xlsx")
+    final_answer(result)
+    ```<end_code>
+    ---
+
+    Task: "Create a sales report Excel file with data for 3 products and calculate which product has the highest sales"
+
+    Thought: I need to create an Excel file with product sales data, then read it back and find the maximum value.
+    Code:
+    ```py
+    # Create Excel file with sales data
+    result = excel_mcp(operation="create_workbook", file_path="sales_report.xlsx")
+    final_answer(result)
+    ```<end_code>
+    ---
+
+    Above examples show both calculator and Excel tool usage. You have access to these tools:
 
     {{tool_descriptions}}
 
@@ -69,12 +106,15 @@ action_planning_template = """
     3. Always use the right arguments for the tools. DO NOT pass the arguments as a dict as in 'answer = calculator({'operation': "add", 'a': 5, 'b': 3})', but use the arguments directly as in 'answer = calculator(operation="add", a=5, b=3)'.
     4. Take care to not chain too many sequential tool calls in the same code block, especially when the output format is unpredictable. For instance, if you need multiple calculations, output intermediate results with print() to use them in the next block.
     5. Call a tool only when needed, and never re-do a tool call that you previously did with the exact same parameters.
-    6. Don't name any new variable with the same name as a tool: for instance don't name a variable calculator.
+    6. Don't name any new variable with the same name as a tool: for instance don't name a variable calculator or excel_mcp.
     7. Never create any notional variables in your code, as having these in your logs might derail you from the true variables.
     8. The state persists between code executions: so if in one step you've created variables or imported modules, these will all persist.
     9. You can use imports in your code, but only from the following list of modules: {{authorized_imports}}
     10. Don't give up! You're in charge of solving the task, not providing directions to solve it.
-    11. Always be helpful and provide clear, accurate mathematical results.
+    11. Always be helpful and provide clear, accurate results.
+    12. When working with Excel files, always check if operations succeeded by examining the returned result dictionary for 'success' key.
+    13. Excel data is returned as lists of lists (rows and columns). Remember to handle headers appropriately when processing data.
+    14. You can combine tools effectively: read Excel data, perform calculations, then write results back to Excel files.
 
     Now Begin! If you solve the task correctly, you will receive a reward of $1,000,000.
 """

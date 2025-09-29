@@ -1,0 +1,14 @@
+{
+    "mcpServers": {
+        "excel": {
+            "command": "uvx",
+            "args": ["excel-mcp-server", "stdio"],
+            "env": {}
+        },
+        "time": {
+            "command": "uvx",
+            "args": ["mcp-server-time"],
+            "env": {}
+        }
+    }
+}
