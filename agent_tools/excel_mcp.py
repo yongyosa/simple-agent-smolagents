@@ -6,6 +6,7 @@ import os
 from typing import Any
 from smolagents import Tool
 from mcp.connector import MCPConnector
+import ast  # Added for safe literal evaluation
 
 
 class ExcelMCPTool(Tool):
@@ -371,21 +372,33 @@ class ExcelMCPTool(Tool):
         })
         
         if "error" not in response and response.get("result"):
-            # Parse the metadata string to extract worksheet names
+            # Safely parse metadata (JSON first, then literal_eval)
             try:
-                metadata = eval(response["result"]) if isinstance(response["result"], str) else response["result"]
-                worksheets = metadata.get("sheets", [])
+                raw_meta = response.get("result")
+                metadata = {}
+                if isinstance(raw_meta, dict):
+                    metadata = raw_meta
+                elif isinstance(raw_meta, str):
+                    try:
+                        import json
+                        metadata = json.loads(raw_meta)
+                    except Exception:
+                        try:
+                            metadata = ast.literal_eval(raw_meta)
+                        except Exception:
+                            metadata = {}
+                worksheets = metadata.get("sheets", []) if isinstance(metadata, dict) else []
                 return {
                     "success": True,
-                    "worksheets": worksheets,
+                    "worksheets": worksheets or ["Sheet1"],
                     "file_path": file_path
                 }
-            except Exception:
-                # Fallback if parsing fails
+            except Exception as e:
                 return {
                     "success": True,
-                    "worksheets": ["Sheet1"],  # Default assumption
-                    "file_path": file_path
+                    "worksheets": ["Sheet1"],  # Fallback
+                    "file_path": file_path,
+                    "warning": f"Metadata parse issue: {e}"
                 }
         else:
             return {
@@ -397,15 +410,18 @@ class ExcelMCPTool(Tool):
     def _create_chart(self, file_path: str, worksheet_name: str, data: Any, options: dict = None) -> dict:
         """Create a chart in the Excel file"""
         params = {
-            "file_path": file_path,
-            "worksheet_name": worksheet_name or "Sheet1",
+            "filepath": file_path,
+            "sheet_name": worksheet_name or "Sheet1",
             "data_range": data,
             "chart_type": (options or {}).get("chart_type", "line")
         }
         if options:
             params.update(options)
-            
-        response = self._send_mcp_request("create_chart", params)
+        
+        response = self._send_mcp_request(self.MCP_TOOLS_CALL, {
+            "name": "create_chart",
+            "arguments": params
+        })
         
         if "error" not in response and response.get("result"):
             return {
@@ -423,13 +439,16 @@ class ExcelMCPTool(Tool):
     def _format_cells(self, file_path: str, worksheet_name: str, range: str, options: dict = None) -> dict:
         """Format cells in the Excel file"""
         params = {
-            "file_path": file_path,
-            "worksheet_name": worksheet_name or "Sheet1",
+            "filepath": file_path,
+            "sheet_name": worksheet_name or "Sheet1",
             "range": range,
             "formatting": options or {}
         }
         
-        response = self._send_mcp_request("format_cells", params)
+        response = self._send_mcp_request(self.MCP_TOOLS_CALL, {
+            "name": "format_cells",
+            "arguments": params
+        })
         
         if "error" not in response and response.get("result"):
             return {
@@ -447,13 +466,16 @@ class ExcelMCPTool(Tool):
     def _create_pivot_table(self, file_path: str, worksheet_name: str, data: Any, options: dict = None) -> dict:
         """Create a pivot table"""
         params = {
-            "file_path": file_path,
+            "filepath": file_path,
             "source_worksheet": worksheet_name or "Sheet1",
             "data_range": data,
             "pivot_options": options or {}
         }
         
-        response = self._send_mcp_request("create_pivot_table", params)
+        response = self._send_mcp_request(self.MCP_TOOLS_CALL, {
+            "name": "create_pivot_table",
+            "arguments": params
+        })
         
         if "error" not in response and response.get("result"):
             return {
