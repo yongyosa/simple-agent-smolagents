@@ -20,6 +20,7 @@ from prompts.templates import (
 )
 from agent_tools.calculator import CalculatorTool
 from agent_tools.excel_mcp import ExcelMCPTool
+from agent_tools.time_mcp import TimeMCPTool
 
 
 class LiteLLMModel(Model):
@@ -122,12 +123,13 @@ class SimpleAgent:
         self.agent = self._init_agent()
 
     def _init_agent(self) -> CodeAgent:
-        """Initialize the CodeAgent with calculator tool, Excel MCP tool, and custom prompts."""
+        """Initialize the CodeAgent with calculator tool, Excel MCP tool, time MCP tool, and custom prompts."""
         
-        # Create tools list with both calculator and Excel tools
+        # Create tools list with calculator, Excel, and Time tools
         tools_list = [
             CalculatorTool(),
-            ExcelMCPTool()
+            ExcelMCPTool(),
+            TimeMCPTool()
         ]
         
         # Prepare dynamic values for prompt templates

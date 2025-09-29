@@ -23,13 +23,17 @@ def main():
     print("🔧 Available Tools:")
     print("1. 🔢 Calculator Tool - Mathematical operations")
     print("2. 📊 Excel Tool - Create, read, and modify Excel files")
+    print("3. ⏰ Time Tool - Date/time operations and timezone conversions")
     print()
     
-    # Test questions demonstrating both tools
+    # Test questions demonstrating all tools
     test_questions = [
         # Excel examples
         f"Create an Excel file at '{temp_dir}/budget.xlsx' with my expenses: Rent 1200, Food 400, Transport 150",
-        f"Read the data from '{temp_dir}/budget.xlsx', doulbe the food amount and calculate the total expenses. Then, write the result back to the file with name budget_modify.xlsx",
+        f"""Read the data from '{temp_dir}/budget.xlsx', then do the following tasks: 
+            1. Double the food amount and calculate the total expenses. 
+            2. Add date time now (CET) to all entries. 
+            3. Then, write the result back to the file with name budget_modify.xlsx""",
     ]
     
     for i, question in enumerate(test_questions, 1):
