@@ -113,6 +113,7 @@ print(response)  # Output: Excel file created successfully
 The agent follows a modular architecture with MCP server integration:
 
 ```
+```
 ┌─────────────────────────────────────────────────────────────┐
 │                     SmolAgent Framework                     │
 │  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────┐ │
@@ -124,11 +125,12 @@ The agent follows a modular architecture with MCP server integration:
                          ┌─────────▼────────────────▼─────────┐
                          │        MCP Connector              │
                          │   (Process Management & I/O)      │
+                         │    Supports: uvx, npx, python     │
                          └─────────┬────────────────┬─────────┘
                                    │                │
                     ┌──────────────▼──────────────┐ │
                     │    Excel MCP Server         │ │
-                    │  (uvx excel-mcp-server)     │ │
+                    │    (uvx excel-mcp-server)   │ │
                     │                             │ │
                     │ ┌─────────────────────────┐ │ │
                     │ │ • create_workbook       │ │ │
@@ -151,6 +153,17 @@ The agent follows a modular architecture with MCP server integration:
                                    │ └───────────────────────────┘ │
                                    └───────────────────────────────┘
 
+Optional: Additional MCP Servers (npx, pip, etc.)
+┌───────────────────────────────────────────────────────────────┐
+│                    Slack MCP Server                           │
+│          (npx @modelcontextprotocol/server-slack)             │
+│                                                               │
+│ ┌───────────────────────────────────────────────────────────┐ │
+│ │ • list_channels     • send_message     • get_messages    │ │
+│ │ • Requires: SLACK_BOT_TOKEN, SLACK_TEAM_ID              │ │
+│ └───────────────────────────────────────────────────────────┘ │
+└───────────────────────────────────────────────────────────────┘
+
 Communication Flow:
 1. User asks natural language question
 2. SmolAgent processes and determines which tool(s) to use
@@ -158,6 +171,13 @@ Communication Flow:
 4. MCP Server executes operation and returns result
 5. Tool formats result for SmolAgent
 6. SmolAgent provides natural language response to user
+
+Package Manager Support:
+• uvx: Python-based MCP servers (automatic installation)
+• npx: Node.js-based MCP servers (automatic installation)  
+• pip: Direct Python package installation
+• Any executable: Custom server commands
+```
 ```
 
 ### File Organization:
@@ -232,9 +252,44 @@ simple-agent-smolagents/
 
 ## MCP Server Dependencies
 
-The project uses the following MCP servers via uvx (automatically managed):
+The project supports MCP servers via multiple package managers:
+
+**uvx (Python-based servers):**
 - `excel-mcp-server`: Excel operations server
 - `mcp-server-time`: Time and timezone operations server
+
+**npx (Node.js-based servers):**
+- `@modelcontextprotocol/server-slack`: Slack integration server
+- Any other npm-published MCP server
+
+**Configuration Examples:**
+
+```json
+{
+  "mcpServers": {
+    "excel": {
+      "command": "uvx",
+      "args": ["excel-mcp-server", "stdio"],
+      "env": {}
+    },
+    "time": {
+      "command": "uvx", 
+      "args": ["mcp-server-time"],
+      "env": {}
+    },
+    "slack": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": "xoxb-your-bot-token",
+        "SLACK_TEAM_ID": "your-team-id"
+      }
+    }
+  }
+}
+```
+
+The connector automatically manages server lifecycle regardless of the package manager used.
 
 ## Advanced Usage
 
@@ -303,11 +358,20 @@ python scripts/mcp_demo.py --interactive
 ```
 
 **Available MCP Servers:**
-- **Excel MCP Server**: Excel file operations (create, read, write), chart and pivot table generation, cell formatting and styling
-- **Time MCP Server**: Current time retrieval, timezone conversions, IANA timezone support
+- **Excel MCP Server** (uvx): Excel file operations (create, read, write), chart and pivot table generation, cell formatting and styling
+- **Time MCP Server** (uvx): Current time retrieval, timezone conversions, IANA timezone support  
+- **Slack MCP Server** (npx): Slack channel operations, message sending/reading (requires Slack bot token)
 
 **MCP Configuration:**
 - Server configurations are defined in `mcp/mcp_servers.json`
-- Servers are automatically started via uvx when first used
+- Supports both uvx (Python) and npx (Node.js) package managers
+- Servers are automatically started when first used
+- Environment variables can be configured per server
 - Multiple servers can run concurrently
 - Each tool manages its own server lifecycle
+
+**Adding New MCP Servers:**
+1. Add server configuration to `mcp/mcp_servers.json`
+2. Create a tool wrapper class in `agent_tools/`
+3. Add the tool to your agent's tools list
+4. Configure any required environment variables

@@ -9,6 +9,14 @@
             "command": "uvx",
             "args": ["mcp-server-time"],
             "env": {}
+        },
+        "slack": {
+            "command": "npx",
+            "args": ["-y", "@modelcontextprotocol/server-slack"],
+            "env": {
+                "SLACK_BOT_TOKEN": "xoxb-your-bot-token",
+                "SLACK_TEAM_ID": "your-team-id"
+            }
         }
     }
 }
