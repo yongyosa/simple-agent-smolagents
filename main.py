@@ -25,6 +25,7 @@ def main():
     print("2. 📊 Excel Tool - Create, read, and modify Excel files")
     print("3. ⏰ Time Tool - Date/time operations and timezone conversions")
     print("4. 💬 Slack Tool - Read and send messages in Slack channels")
+    print("5. 📅 DCS Calendar Tool - Generate DCS calendar templates with working day dates")
     print()
     
     # Test questions demonstrating all tools
@@ -35,11 +36,20 @@ def main():
     #         1. Double the food amount and calculate the total expenses. 
     #         2. Add date time now (CET) to all entries. 
     #         3. Then, write the result back to the file with name budget_modify.xlsx""",
-    # ]
+
 
     # Slack example with image upload
+    # test_questions = [
+    #     "Please send the file 'temp_files/sample_calendar.png' to Slack channel 'C09H5KW3475' with the message 'Here is our sample calendar!'"
+    # ]
+
+    # Test DSC Forecast activity step1
     test_questions = [
-        "Please send the file 'temp_files/sample_calendar.png' to Slack channel 'C09H5KW3475' with the message 'Here is our sample calendar!'"
+        f"""Please do the following:
+            1. Generate the DCS calendar template for November 2025.
+            2. Send the message with the output from step 1 in this Slack channel:  'C09H5KW3475'
+            3. After that, send the image file 'temp_files/sample_calendar.png' to same Slack channel 'C09H5KW3475'
+        """
     ]
 
     for i, question in enumerate(test_questions, 1):

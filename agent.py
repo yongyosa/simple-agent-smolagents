@@ -22,6 +22,7 @@ from agent_tools.calculator import CalculatorTool
 from agent_tools.excel_mcp import ExcelMCPTool
 from agent_tools.time_mcp import TimeMCPTool
 from agent_tools.slack_mcp import SlackMCPTool
+from agent_tools.create_dcs_calendar import CreateDCSCalendarTool
 
 
 class LiteLLMModel(Model):
@@ -126,12 +127,13 @@ class SimpleAgent:
     def _init_agent(self) -> CodeAgent:
         """Initialize the CodeAgent with calculator tool, Excel MCP tool, time MCP tool, and custom prompts."""
         
-        # Create tools list with calculator, Excel, Time, and Slack tools
+        # Create tools list with calculator, Excel, Time, Slack, and DCS Calendar tools
         tools_list = [
             CalculatorTool(),
             ExcelMCPTool(),
             TimeMCPTool(),
-            SlackMCPTool()
+            SlackMCPTool(),
+            CreateDCSCalendarTool()
         ]
         
         # Prepare dynamic values for prompt templates

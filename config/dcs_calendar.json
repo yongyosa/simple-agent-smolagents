@@ -1,0 +1,44 @@
+{
+  "dcs_calendar": {
+    "title": "DCS Monthly Process Calendar",
+    "description": "Data Consolidation Services monthly workflow calendar",
+    "process_steps": [
+      {
+        "step_number": 1,
+        "step_name": "Post GRs",
+        "description": "Post Goods Receipts",
+        "number_working_day_due_date": "2"
+      },
+      {
+        "step_number": 2,
+        "step_name": "Update allocation sheet",
+        "description": "Update allocation sheet with latest data",
+        "number_working_day_due_date": "3"
+      },
+      {
+        "step_number": 3,
+        "step_name": "Update cost allocation",
+        "description": "Update cost allocation based on allocation sheet",
+        "number_working_day_due_date": "3"
+      },
+      {
+        "step_number": 4,
+        "step_name": "Sign off",
+        "description": "Management sign off on cost allocations",
+        "number_working_day_due_date": "5"
+      },
+      {
+        "step_number": 5,
+        "step_name": "Enter data in YPPM",
+        "description": "Enter approved data into YPPM system",
+        "number_working_day_due_date": "7"
+      },
+      {
+        "step_number": 6,
+        "step_name": "Consolidate forecast",
+        "description": "Consolidate forecast data and generate reports",
+        "number_working_day_due_date": "8"
+      }
+    ]
+  }
+}
