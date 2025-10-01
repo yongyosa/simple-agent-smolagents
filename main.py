@@ -37,10 +37,9 @@ def main():
     #         3. Then, write the result back to the file with name budget_modify.xlsx""",
     # ]
 
-    # Slack example
+    # Slack example with image upload
     test_questions = [
-        f"Read last 5 messages to Slack channel 'C09H5KW3475'"
-        # f"send a message to Slack channel 'C09H5KW3475' with this content: 'Hello world, from SmolAgent"
+        "Please send the file 'temp_files/sample_calendar.png' to Slack channel 'C09H5KW3475' with the message 'Here is our sample calendar!'"
     ]
 
     for i, question in enumerate(test_questions, 1):

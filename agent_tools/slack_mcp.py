@@ -11,13 +11,13 @@ class SlackMCPTool(Tool):
     """Slack MCP tool that provides Slack operations via MCP protocol"""
     
     name = "slack_mcp"
-    description = """A Slack integration tool that can read messages, send messages, and interact with Slack channels.
+    description = """A Slack integration tool that can read messages, send messages, send images, and interact with Slack channels.
     Requires proper Slack bot token configuration."""
     
     inputs = {
         "operation": {
             "type": "string",
-            "description": "The Slack operation to perform. Available operations: list_channels, send_message, get_messages"
+            "description": "The Slack operation to perform. Available operations: list_channels, send_message, send_image, get_messages"
         },
         "channel": {
             "type": "string", 
@@ -26,7 +26,12 @@ class SlackMCPTool(Tool):
         },
         "message": {
             "type": "string",
-            "description": "Message text to send. Required for send_message operation.",
+            "description": "Message text to send. Required for send_message operation, optional for send_image.",
+            "nullable": True
+        },
+        "image_path": {
+            "type": "string",
+            "description": "Local file path to image to upload. Required for send_image operation.",
             "nullable": True
         },
         "limit": {
@@ -104,7 +109,7 @@ class SlackMCPTool(Tool):
         except Exception as e:
             return {"error": f"MCP communication error: {str(e)}"}
     
-    def forward(self, operation: str, channel: str = None, message: str = None, limit: int = None) -> dict:
+    def forward(self, operation: str, channel: str = None, message: str = None, image_path: str = None, limit: int = None) -> dict:
         """Execute Slack operations via MCP protocol"""
         
         try:
@@ -112,13 +117,15 @@ class SlackMCPTool(Tool):
                 return self._list_channels()
             elif operation == "send_message":
                 return self._send_message(channel, message)
+            elif operation == "send_image":
+                return self._send_image(channel, image_path, message)
             elif operation == "get_messages":
                 return self._get_messages(channel, limit)
             else:
                 return {
                     "success": False,
                     "error": f"Unknown operation: {operation}",
-                    "available_operations": ["list_channels", "send_message", "get_messages"]
+                    "available_operations": ["list_channels", "send_message", "send_image", "get_messages"]
                 }
                 
         except Exception as e:
@@ -287,6 +294,154 @@ class SlackMCPTool(Tool):
                 "details": response
             }
     
+    def _send_image(self, channel: str, image_path: str, message: str = None) -> dict:
+        """Send an image to a Slack channel using file upload"""
+        if not channel:
+            return {
+                "success": False,
+                "error": "Channel parameter is required for send_image operation"
+            }
+            
+        if not image_path:
+            return {
+                "success": False,
+                "error": "image_path parameter is required for send_image operation"
+            }
+        
+        # Check if file exists
+        import os
+        if not os.path.exists(image_path):
+            return {
+                "success": False,
+                "error": f"Image file not found: {image_path}"
+            }
+        
+        try:
+            # Since the Slack MCP server doesn't have file upload, 
+            # we'll implement a direct Slack API call using the new upload method
+            import json
+            import urllib.request
+            import urllib.parse
+            
+            # Get bot token from environment or MCP connector
+            bot_token = None
+            
+            # First try to get from MCP connector if available
+            if self.mcp_connector and hasattr(self.mcp_connector, 'servers') and "slack" in self.mcp_connector.servers:
+                bot_token = self.mcp_connector.servers["slack"].env.get("SLACK_BOT_TOKEN")
+            
+            # Fallback to environment variable
+            if not bot_token:
+                import os
+                bot_token = os.environ.get("SLACK_BOT_TOKEN")
+            
+            # Last resort: try loading from .env file directly
+            if not bot_token:
+                try:
+                    with open('.env', 'r') as f:
+                        for line in f:
+                            if line.startswith('SLACK_BOT_TOKEN='):
+                                bot_token = line.split('=', 1)[1].strip()
+                                break
+                except FileNotFoundError:
+                    pass
+            
+            if not bot_token:
+                return {
+                    "success": False,
+                    "error": "SLACK_BOT_TOKEN not found in environment or .env file"
+                }
+            
+            # Read and encode the image
+            with open(image_path, 'rb') as f:
+                image_data = f.read()
+            
+            # Get file info
+            filename = os.path.basename(image_path)
+            file_size = len(image_data)
+            
+            # Step 1: Get upload URL using the new Slack API
+            upload_url_response = urllib.request.Request(
+                'https://slack.com/api/files.getUploadURLExternal',
+                data=urllib.parse.urlencode({
+                    'filename': filename,
+                    'length': file_size
+                }).encode('utf-8'),
+                headers={
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': f'Bearer {bot_token}'
+                }
+            )
+            
+            with urllib.request.urlopen(upload_url_response) as response:
+                upload_data = json.loads(response.read().decode('utf-8'))
+            
+            if not upload_data.get('ok'):
+                return {
+                    "success": False,
+                    "error": f"Failed to get upload URL: {upload_data.get('error', 'Unknown error')}",
+                    "details": upload_data
+                }
+            
+            # Step 2: Upload file to the external URL
+            upload_url = upload_data['upload_url']
+            file_id = upload_data['file_id']
+            
+            upload_request = urllib.request.Request(
+                upload_url,
+                data=image_data,
+                headers={
+                    'Content-Type': 'application/octet-stream'
+                }
+            )
+            
+            with urllib.request.urlopen(upload_request) as response:
+                if response.status != 200:
+                    return {
+                        "success": False,
+                        "error": f"Failed to upload file. Status: {response.status}"
+                    }
+            
+            # Step 3: Complete the upload and share to channel
+            complete_request = urllib.request.Request(
+                'https://slack.com/api/files.completeUploadExternal',
+                data=urllib.parse.urlencode({
+                    'files': json.dumps([{
+                        'id': file_id,
+                        'title': filename
+                    }]),
+                    'channel_id': channel,
+                    'initial_comment': message or ''
+                }).encode('utf-8'),
+                headers={
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': f'Bearer {bot_token}'
+                }
+            )
+            
+            with urllib.request.urlopen(complete_request) as response:
+                response_data = json.loads(response.read().decode('utf-8'))
+            
+            if response_data.get('ok'):
+                return {
+                    "success": True,
+                    "file_uploaded": response_data,
+                    "channel": channel,
+                    "filename": filename
+                }
+            else:
+                return {
+                    "success": False,
+                    "error": response_data.get('error', 'File upload failed'),
+                    "details": response_data
+                }
+                
+        except Exception as e:
+            return {
+                "success": False,
+                "error": f"Failed to upload image: {str(e)}"
+            }
+
     def __del__(self):
         """Cleanup: stop MCP server when tool is destroyed"""
         if self.mcp_connector and self._server_started:
