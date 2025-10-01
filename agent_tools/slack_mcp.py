@@ -20,8 +20,8 @@ class SlackMCPTool(Tool):
             "description": "The Slack operation to perform. Available operations: list_channels, send_message, get_messages"
         },
         "channel": {
-            "type": "string",
-            "description": "Slack channel name or ID. Required for most operations.",
+            "type": "string", 
+            "description": "Slack channel ID (starts with C). Required for most operations.",
             "nullable": True
         },
         "message": {
@@ -130,15 +130,40 @@ class SlackMCPTool(Tool):
     def _list_channels(self) -> dict:
         """List Slack channels"""
         response = self._send_mcp_request("tools/call", {
-            "name": "list_channels",
+            "name": "slack_list_channels",
             "arguments": {}
         })
         
         if "error" not in response and response.get("result"):
-            return {
-                "success": True,
-                "channels": response["result"]
-            }
+            try:
+                import json
+                result_content = response["result"]
+                if isinstance(result_content, dict) and "content" in result_content:
+                    # Extract JSON string from content
+                    json_text = result_content["content"][0]["text"]
+                    slack_data = json.loads(json_text)
+                    
+                    if slack_data.get("ok"):
+                        return {
+                            "success": True,
+                            "channels": slack_data.get("channels", [])
+                        }
+                    else:
+                        return {
+                            "success": False,
+                            "error": slack_data.get("error", "Slack API error")
+                        }
+                else:
+                    return {
+                        "success": True,
+                        "channels": result_content
+                    }
+            except (json.JSONDecodeError, KeyError, IndexError) as e:
+                return {
+                    "success": False,
+                    "error": f"Failed to parse Slack response: {str(e)}",
+                    "raw_response": response.get("result")
+                }
         else:
             return {
                 "success": False,
@@ -155,20 +180,47 @@ class SlackMCPTool(Tool):
             }
             
         params = {
-            "channel": channel,
-            "message": message
+            "channel_id": channel,
+            "text": message
         }
         response = self._send_mcp_request("tools/call", {
-            "name": "send_message",
+            "name": "slack_post_message",
             "arguments": params
         })
         
         if "error" not in response and response.get("result"):
-            return {
-                "success": True,
-                "message_sent": response["result"],
-                "channel": channel
-            }
+            try:
+                import json
+                result_content = response["result"]
+                if isinstance(result_content, dict) and "content" in result_content:
+                    # Extract JSON string from content
+                    json_text = result_content["content"][0]["text"]
+                    slack_data = json.loads(json_text)
+                    
+                    if slack_data.get("ok"):
+                        return {
+                            "success": True,
+                            "message_sent": slack_data,
+                            "channel": channel
+                        }
+                    else:
+                        return {
+                            "success": False,
+                            "error": slack_data.get("error", "Slack API error"),
+                            "channel": channel
+                        }
+                else:
+                    return {
+                        "success": True,
+                        "message_sent": result_content,
+                        "channel": channel
+                    }
+            except (json.JSONDecodeError, KeyError, IndexError) as e:
+                return {
+                    "success": False,
+                    "error": f"Failed to parse Slack response: {str(e)}",
+                    "raw_response": response.get("result")
+                }
         else:
             return {
                 "success": False,
@@ -184,21 +236,50 @@ class SlackMCPTool(Tool):
                 "error": "Channel parameter is required for get_messages operation"
             }
             
-        params = {"channel": channel}
+        params = {"channel_id": channel}
         if limit:
             params["limit"] = limit
             
         response = self._send_mcp_request("tools/call", {
-            "name": "get_messages",
+            "name": "slack_get_channel_history",
             "arguments": params
         })
         
         if "error" not in response and response.get("result"):
-            return {
-                "success": True,
-                "messages": response["result"],
-                "channel": channel
-            }
+            # Parse the JSON response from the MCP server
+            try:
+                import json
+                result_content = response["result"]
+                if isinstance(result_content, dict) and "content" in result_content:
+                    # Extract JSON string from content
+                    json_text = result_content["content"][0]["text"]
+                    slack_data = json.loads(json_text)
+                    
+                    if slack_data.get("ok"):
+                        return {
+                            "success": True,
+                            "messages": slack_data.get("messages", []),
+                            "channel": channel,
+                            "has_more": slack_data.get("has_more", False)
+                        }
+                    else:
+                        return {
+                            "success": False,
+                            "error": slack_data.get("error", "Slack API error"),
+                            "channel": channel
+                        }
+                else:
+                    return {
+                        "success": True,
+                        "messages": result_content,
+                        "channel": channel
+                    }
+            except (json.JSONDecodeError, KeyError, IndexError) as e:
+                return {
+                    "success": False,
+                    "error": f"Failed to parse Slack response: {str(e)}",
+                    "raw_response": response.get("result")
+                }
         else:
             return {
                 "success": False,

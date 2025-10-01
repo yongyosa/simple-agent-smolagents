@@ -24,18 +24,25 @@ def main():
     print("1. 🔢 Calculator Tool - Mathematical operations")
     print("2. 📊 Excel Tool - Create, read, and modify Excel files")
     print("3. ⏰ Time Tool - Date/time operations and timezone conversions")
+    print("4. 💬 Slack Tool - Read and send messages in Slack channels")
     print()
     
     # Test questions demonstrating all tools
+    # test_questions = [
+    #     # Excel examples
+    #     f"Create an Excel file at '{temp_dir}/budget.xlsx' with my expenses: Rent 1200, Food 400, Transport 150",
+    #     f"""Read the data from '{temp_dir}/budget.xlsx', then do the following tasks: 
+    #         1. Double the food amount and calculate the total expenses. 
+    #         2. Add date time now (CET) to all entries. 
+    #         3. Then, write the result back to the file with name budget_modify.xlsx""",
+    # ]
+
+    # Slack example
     test_questions = [
-        # Excel examples
-        f"Create an Excel file at '{temp_dir}/budget.xlsx' with my expenses: Rent 1200, Food 400, Transport 150",
-        f"""Read the data from '{temp_dir}/budget.xlsx', then do the following tasks: 
-            1. Double the food amount and calculate the total expenses. 
-            2. Add date time now (CET) to all entries. 
-            3. Then, write the result back to the file with name budget_modify.xlsx""",
+        f"Read last 5 messages to Slack channel 'C09H5KW3475'"
+        # f"send a message to Slack channel 'C09H5KW3475' with this content: 'Hello world, from SmolAgent"
     ]
-    
+
     for i, question in enumerate(test_questions, 1):
         print(f"\n🧪 Test {i}: {question}")
         print("🤖 Processing...")
