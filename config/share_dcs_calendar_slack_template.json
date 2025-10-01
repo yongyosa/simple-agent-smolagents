@@ -1,0 +1,18 @@
+{
+  "share_dsc_calendar_slack_template": {
+    "title": "DCS Calendar Slack Notification Template",
+    "description": "Template for sharing DCS monthly process calendar in Slack",
+    "template": [
+      "<!here> Hello everyone, good morning. Below you find the key actions for the October forecasting exercise (please take a look at the <https://yara.sharepoint.com/:x:/r/teams/DigitalCoreSolutions/General/00%20-%20Calendar/2025/DCS%20Calendar%202025.xlsx?d=w9459ee1e9aa142128ad46f8a0744d55c&csf=1&web=1&e=cj0xUw|DCS calendar> for more details).",
+      "",
+      "1. Post GRs, latest by {PLACEHOLDER_STEP_1_DATE} (= last possible day to post GRs in September) – GR responsible",
+      "2. Update Tech/DS/UX cost allocation sheets and do the sign-off by Friday, {PLACEHOLDER_STEP_2_DATE}–  Tech / DS / UX manager",
+      "3. Update product cost allocation sheets by {PLACEHOLDER_STEP_3_DATE} – Product manager",
+      "4. Review the full product scope, actuals and forecast, and do the sign-off by {PLACEHOLDER_STEP_4_DATE} - Program manager",
+      "5. Enter/adjust forecasts in YPPM by {PLACEHOLDER_STEP_5_DATE}  – Product / Project manager",
+      "6. Consolidate forecast (for discussion in management teams) by {PLACEHOLDER_STEP_6_DATE}- Business Office",
+      "",
+      "Reminders will be posted on this channel when the deadlines come closer."
+    ]
+  }
+}

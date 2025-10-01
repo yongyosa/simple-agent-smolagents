@@ -30,7 +30,44 @@ class MCPConnector:
         self.config_file = config_file
         self.servers: Dict[str, MCPServer] = {}
         self.active_processes: Dict[str, subprocess.Popen] = {}
+        self.env_vars: Dict[str, str] = {}
+        self.load_env_file()
         self.load_config()
+    
+    def load_env_file(self, env_file: str = ".env"):
+        """Load environment variables from .env file"""
+        try:
+            if os.path.exists(env_file):
+                with open(env_file, 'r') as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith('#') and '=' in line:
+                            key, value = line.split('=', 1)
+                            self.env_vars[key.strip()] = value.strip()
+                print(f"✅ Loaded environment variables from {env_file}")
+            else:
+                print(f"⚠️  Environment file {env_file} not found, using config values")
+        except Exception as e:
+            print(f"❌ Error loading environment file {env_file}: {e}")
+    
+    def resolve_env_variable(self, value: str) -> str:
+        """Resolve environment variable references in format ${VAR_NAME} or $VAR_NAME"""
+        if isinstance(value, str):
+            # Handle ${VAR_NAME} format
+            import re
+            def replace_env_var(match):
+                var_name = match.group(1)
+                return self.env_vars.get(var_name, os.environ.get(var_name, match.group(0)))
+            
+            # Replace ${VAR_NAME} patterns
+            value = re.sub(r'\$\{([^}]+)\}', replace_env_var, value)
+            
+            # Replace $VAR_NAME patterns (simple case)
+            if value.startswith('$'):
+                var_name = value[1:]
+                return self.env_vars.get(var_name, os.environ.get(var_name, value))
+        
+        return value
     
     def load_config(self):
         """Load MCP server configurations from JSON file"""
@@ -39,11 +76,16 @@ class MCPConnector:
                 config = json.load(f)
             
             for name, server_config in config.get('mcpServers', {}).items():
+                # Resolve environment variables in the env section
+                resolved_env = {}
+                for key, value in server_config.get('env', {}).items():
+                    resolved_env[key] = self.resolve_env_variable(value)
+                
                 self.servers[name] = MCPServer(
                     name=name,
                     command=server_config['command'],
                     args=server_config.get('args', []),
-                    env=server_config.get('env', {})
+                    env=resolved_env
                 )
             print(f"✅ Loaded {len(self.servers)} MCP server configurations")
             
